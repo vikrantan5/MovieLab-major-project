@@ -91,8 +91,8 @@ const SKILLS = [
 
 const TIMELINE = [
   { year: '2015', title: 'School', desc: 'Discovered the joy of computers — built my first “Hello World”.', icon: GraduationCap },
-  { year: '2019', title: 'Engineering', desc: 'Studied CS fundamentals, algorithms and DSA.', icon: BrainCircuit },
-  { year: '2021', title: 'Web Development', desc: 'Fell in love with React and the modern JS ecosystem.', icon: Code2 },
+  { year: '2023', title: 'Engineering', desc: 'Studied CS fundamentals, algorithms and DSA.', icon: BrainCircuit },
+  { year: '2023', title: 'Web Development', desc: 'Fell in love with React and the modern JS ecosystem.', icon: Code2 },
   { year: '2022', title: 'Content Creation', desc: 'Started teaching what I learned on YouTube.', icon: Youtube },
   { year: '2024', title: 'Current Projects', desc: 'Shipping production-grade full-stack apps.', icon: Rocket },
   { year: 'Today', title: 'Tech Stack', desc: 'React · Next.js · Node · Mongo · Docker · K8s.', icon: Briefcase },
