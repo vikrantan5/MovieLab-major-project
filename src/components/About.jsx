@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
+// ✅ Correct
 import {
   Code2, Rocket, Youtube, BrainCircuit, GraduationCap, Briefcase,
   Github, Linkedin, Twitter, Mail, ArrowRight, Sparkles, Trophy, Layers,
