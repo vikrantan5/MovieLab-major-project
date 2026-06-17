@@ -1,23 +1,20 @@
-
-
-
-import React from "react";
-
-const Dropdown = ({ title, options, func }) => {
+const Dropdown = ({ title, options, func, value }) => {
   return (
-    <div className="select">
-      <select defaultValue="0" onChange={func} name="format" id="format">
-        <option value="0" disabled>
-          {title}
+    <select
+      defaultValue={value || '0'}
+      onChange={func}
+      className="select-modern"
+      aria-label={title}
+    >
+      <option value="0" disabled>
+        {title}
+      </option>
+      {options.map((o) => (
+        <option key={o} value={o}>
+          {o.toString().replace(/_/g, ' ').toUpperCase()}
         </option>
-
-        {options.map((o, i) => (
-          <option key={i} value={o}>
-            {o.toUpperCase()}
-          </option>
-        ))}
-      </select>
-    </div>
+      ))}
+    </select>
   );
 };
 

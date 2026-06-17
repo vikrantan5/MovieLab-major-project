@@ -1,92 +1,78 @@
-import  { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Topnav from "./partials/Topnav";
-import Dropdown from "./partials/Dropdown";
-import axios from "../utils/axios";
-import Cards from "./partials/Cards";
-import Loading from "./Loading";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import axios from '../utils/axios';
+import Cards from './partials/Cards';
+import Dropdown from './partials/Dropdown';
+import PageHeader from './partials/PageHeader';
+import { GridSkeleton } from './partials/Skeleton';
+import { Loader2 } from 'lucide-react';
+
 const Trending = () => {
-        document.title = "MovieLab |Popular"
+  document.title = 'MovieLab — Trending';
+  const [category, setCategory] = useState('all');
+  const [duration, setDuration] = useState('day');
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const navigate = useNavigate();
-
-  const [category, setcategory] = useState("all");
-  const [duration, setduration] = useState("day");
-  const [trending, settrending] = useState([]);
-  const [page, setpage] = useState(1);
-  const [hasMore , sethasMore] =  useState(true)
-
-  const GetTrending = async () => {
-    try {
-      const { data } = await axios.get(`/trending/${category}/${duration}?page=${page}`);
-      //   settrending(data.results);
-
-      if (data.results.length > 0) {
-        settrending((prevState) => [...prevState, ...data.results]);
-        setpage(page + 1);
-      }
-      else{
-        sethasMore(false);
-
-      }
-    } catch (error) {
-      console.log("error:", error);
-    }
+  const fetchPage = async (p, cat, dur) => {
+    const { data } = await axios.get(`/trending/${cat}/${dur}?page=${p}`);
+    return data.results;
   };
 
-  const refreshHandler =  () => {
-    if (trending.length === 0) {
-      GetTrending();
-    } else {
-      setpage(1);
-      settrending([]);
-      GetTrending();
-    }
+  const load = async () => {
+    try {
+      const results = await fetchPage(page, category, duration);
+      if (results.length === 0) { setHasMore(false); return; }
+      setItems((prev) => [...prev, ...results]);
+      setPage(page + 1);
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => {
-    refreshHandler();
+    let cancelled = false;
+    setItems([]); setPage(1); setHasMore(true);
+    (async () => {
+      try {
+        const results = await fetchPage(1, category, duration);
+        if (cancelled) return;
+        setItems(results);
+        setPage(2);
+        setHasMore(results.length > 0);
+      } catch (e) { console.error(e); }
+    })();
+    return () => { cancelled = true; };
   }, [category, duration]);
-  //   console.log(trending);
 
-  return trending.length > 0 ? (
-    <div className=" w-screen h-screen ">
-      <div className="px-[5%] w-full   flex items-center justify-between  ">
-        <h1 className=" text-2xl font-semibold text-zinc-400">
-          <i
-            onClick={() => navigate(-1)}
-            className="hover:text-[#6556cd] pr-3 ri-arrow-left-line"
-          ></i>
-          Trending
-        </h1>
-        <div className="flex items-center w-[80%]">
-          <Topnav />
-          <Dropdown
-            title="Category"
-            options={["movie", "tv", "all"]}
-            func={(e) => setcategory(e.target.value)}
-          />
-          <div className="w-[2%]"></div>
-          <Dropdown
-            title="Duration"
-            options={["week", "day"]}
-            func={(e) => setduration(e.target.value)}
-          />
-        </div>
+  return (
+    <div>
+      <PageHeader
+        title="Trending"
+        subtitle="What everyone is watching"
+        right={
+          <div className="hidden sm:flex items-center gap-2">
+            <Dropdown title="Category" value={category} options={['movie', 'tv', 'all']} func={(e) => setCategory(e.target.value)} />
+            <Dropdown title="Duration" value={duration} options={['week', 'day']} func={(e) => setDuration(e.target.value)} />
+          </div>
+        }
+      />
+      <div className="sm:hidden flex gap-2 px-4 pt-3">
+        <Dropdown title="Category" value={category} options={['movie', 'tv', 'all']} func={(e) => setCategory(e.target.value)} />
+        <Dropdown title="Duration" value={duration} options={['week', 'day']} func={(e) => setDuration(e.target.value)} />
       </div>
-
-      <InfiniteScroll
-        dataLength={trending.length}
-        next={GetTrending}
-        hasMore={hasMore}
-        loader={<h1>Loading...</h1>}
-      >
-        <Cards data={trending} title={category} />
-      </InfiniteScroll>
+      {items.length === 0 ? (
+        <GridSkeleton />
+      ) : (
+        <InfiniteScroll
+          dataLength={items.length}
+          next={load}
+          hasMore={hasMore}
+          loader={<div className="flex justify-center py-6 text-zinc-500"><Loader2 className="animate-spin" /></div>}
+        >
+          <Cards data={items} title={category === 'all' ? 'movie' : category} />
+        </InfiniteScroll>
+      )}
     </div>
-  ) : (
-    <Loading />
   );
 };
 
